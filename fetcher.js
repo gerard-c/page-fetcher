@@ -8,7 +8,6 @@ const rl = readline.createInterface({
 });
 
 const args = process.argv.slice(2);
-
 // most of the logic in a separate function in order to interact with fs.access check neatly
 const readAndWrite = () => {
   // expects first argument to be a URL, GETs info from said URL
@@ -30,21 +29,27 @@ const readAndWrite = () => {
   });
 };
 
+const confirm = () => {
+  rl.question(`${args[1]} already exists. Would you like to replace it? (y/n)  `, (answer => {
+    if (answer === 'y') {
+      readAndWrite();
+      rl.close();
+      return;
+    } else if (answer === 'n') {
+      rl.close();
+    }
+    console.log('Invalid response. Please try again.');
+    confirm();
+  }));
+}
+
 fs.access(args[1], fs.F_OK, (err) => {
   if (err) {
     readAndWrite();
     return;
-  } else {
-    rl.question(`${args[1]} already exists. Would you like to replace it? (y/n)  `, (answer => {
-    if (answer === 'y') {
-      readAndWrite();
-      rl.close();
-    } else if (answer === 'n') {
-      rl.close();
-    } else {
-      console.log('Invalid response. Ending program. Please try again.');
-    }
-  }));}
+  }
+  confirm();
 });
+
 
 
